@@ -2,9 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { UserFormValues, userSchema } from "@/lib/validations/user";
 import { User } from "@/types/user";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 interface UserFormProps {
   initialData?: Partial<User>;
@@ -20,23 +22,29 @@ export default function UserForm({
   buttonText,
 }: UserFormProps) {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    name: initialData?.name || "",
-    email: initialData?.email || "",
-    username: initialData?.username || "",
-    phone: initialData?.phone || "",
-    companyName: initialData?.company?.name || "",
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<UserFormValues>({
+    resolver: zodResolver(userSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: initialData?.name || "",
+      email: initialData?.email || "",
+      username: initialData?.username || "",
+      phone: initialData?.phone || "",
+      companyName: initialData?.company?.name || "",
+    },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmitForm = (data: UserFormValues) => {
     const userPayload: Omit<User, "id"> = {
-      name: formData.name,
-      email: formData.email,
-      username:
-        formData.username || formData.name.toLowerCase().replace(/\s/g, ""),
-      phone: formData.phone,
+      name: data.name,
+      email: data.email,
+      username: data.username,
+      phone: data.phone,
       website: initialData?.website || "example.com",
       address: initialData?.address || {
         street: "Main St",
@@ -46,7 +54,7 @@ export default function UserForm({
         geo: { lat: "0", lng: "0" },
       },
       company: {
-        name: formData.companyName,
+        name: data.companyName,
         catchPhrase: initialData?.company?.catchPhrase || "Default Catchphrase",
         bs: initialData?.company?.bs || "Default BS",
       },
@@ -57,21 +65,22 @@ export default function UserForm({
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700">
               Ad Soyad
             </label>
             <Input
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              {...register("name")}
               placeholder="Ad Soyad Giriniz"
-              required
-              className="bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-400"
+              className={`bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-400 ${
+                errors.name ? "border-red-500 focus:border-red-500" : ""
+              }`}
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -79,13 +88,15 @@ export default function UserForm({
               Kullanıcı Adı
             </label>
             <Input
-              value={formData.username}
-              onChange={(e) =>
-                setFormData({ ...formData, username: e.target.value })
-              }
+              {...register("username")}
               placeholder="Kullanıcı Adı Giriniz"
-              className="bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-400"
+              className={`bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-400 ${
+                errors.username ? "border-red-500 focus:border-red-500" : ""
+              }`}
             />
+            {errors.username && (
+              <p className="text-red-500 text-sm">{errors.username.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -93,15 +104,16 @@ export default function UserForm({
               E-posta Adresi
             </label>
             <Input
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
+              {...register("email")}
               placeholder="E-posta Adresi Giriniz"
               type="email"
-              required
-              className="bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-400"
+              className={`bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-400 ${
+                errors.email ? "border-red-500 focus:border-red-500" : ""
+              }`}
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -109,13 +121,15 @@ export default function UserForm({
               Telefon Numarası
             </label>
             <Input
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
+              {...register("phone")}
               placeholder="Telefon Numarası Giriniz"
-              className="bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-400"
+              className={`bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-400 ${
+                errors.phone ? "border-red-500 focus:border-red-500" : ""
+              }`}
             />
+            {errors.phone && (
+              <p className="text-red-500 text-sm">{errors.phone.message}</p>
+            )}
           </div>
         </div>
 
@@ -124,13 +138,15 @@ export default function UserForm({
             Şirket Adı
           </label>
           <Input
-            value={formData.companyName}
-            onChange={(e) =>
-              setFormData({ ...formData, companyName: e.target.value })
-            }
+            {...register("companyName")}
             placeholder="Şirket Adı Giriniz"
-            className="bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-400"
+            className={`bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-400 ${
+              errors.companyName ? "border-red-500 focus:border-red-500" : ""
+            }`}
           />
+          {errors.companyName && (
+            <p className="text-red-500 text-sm">{errors.companyName.message}</p>
+          )}
         </div>
 
         <div className="flex gap-3 pt-4 border-t border-slate-100 mt-6">
@@ -144,10 +160,10 @@ export default function UserForm({
           </Button>
           <Button
             type="submit"
-            disabled={isLoading}
-            className="flex-1 bg-black hover:bg-slate-800 text-white"
+            disabled={isLoading || !isValid}
+            className="flex-1 bg-black hover:bg-slate-800 text-white disabled:bg-slate-300 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Kayıt Ediliyor..." : buttonText}
+            {isLoading ? "Kaydediliyor..." : buttonText}
           </Button>
         </div>
       </form>
