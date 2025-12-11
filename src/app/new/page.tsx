@@ -25,7 +25,7 @@ export default function NewUserPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] p-6 lg:p-10 font-(family-name:--font-geist-sans)">
+    <main className="min-h-screen bg-[#F8F9FB] p-6 lg:p-10">
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <Button

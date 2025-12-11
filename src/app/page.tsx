@@ -16,7 +16,7 @@ export default function Home() {
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
 
   const uniqueCompanies = Array.from(
     new Set(users.map((u) => u.company?.name).filter(Boolean))
@@ -81,7 +81,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] p-6 lg:p-10 font-(family-name:--font-geist-sans)">
+    <main className="min-h-screen bg-[#F8F9FB] p-6 lg:p-10">
       <div className="max-w-7xl mx-auto space-y-6">
         <UserHeader />
 
