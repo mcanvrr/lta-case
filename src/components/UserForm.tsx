@@ -6,6 +6,7 @@ import { UserFormValues, userSchema } from "@/lib/validations/user";
 import { User } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 interface UserFormProps {
@@ -26,6 +27,7 @@ export default function UserForm({
   const {
     register,
     handleSubmit,
+    trigger,
     formState: { errors, isValid },
   } = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
@@ -38,6 +40,12 @@ export default function UserForm({
       companyName: initialData?.company?.name || "",
     },
   });
+
+  useEffect(() => {
+    if (initialData) {
+      trigger();
+    }
+  }, [trigger, initialData]);
 
   const onSubmitForm = (data: UserFormValues) => {
     const userPayload: Omit<User, "id"> = {
